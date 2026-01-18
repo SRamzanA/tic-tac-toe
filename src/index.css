@@ -1,0 +1,8 @@
+html,
+body {
+  width: 100%;
+  height: auto;
+  background-color: #dddccc;
+  display: grid;
+  place-items: center;
+}
