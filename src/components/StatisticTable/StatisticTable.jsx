@@ -1,6 +1,11 @@
 import './StatisticTable.css'
 
 export default function StaticticTable({ newGame, resetGame }) {
+    // setStatistic({
+    //   playerName1: {gameWins: 0, draw: 0 ,wins: 0, played: 0},
+    //   playerName2: {gameWins: 0, draw: 0 ,wins: 0, played: 0}
+    // })
+
     return (
         <div className="stat-popup">
             <div className="stat-buttons">
