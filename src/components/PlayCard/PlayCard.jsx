@@ -72,13 +72,25 @@ const LINES = [
 export default function PlayCard() {
   const [grid, setGrid] = useState(Array(9).fill(null)) // клетки [null, null, null, null, null, null, null, null, null]
   const [isXTurn, setIsXTurn] = useState(true) // чей ход (true = x | false - o)
-  const [scores, setScores] = useState({ player1: 0, player2: 0 })
+  const [scores, setScores] = useState({ player1: 2, player2: 0 })
   const [playerNames, setPlayerNames] = useState({player1: "Игрок 1", player2: "Игрок 2"}) // Имена игроков
   const [showWinPopup, setShowWinPopup] = useState(false) // показ попап с победителем
   const [winnerMessage, setWinnerMessage] = useState("") // кто победил
+
   const [gameActive, setGameActive] = useState(true) // активна ли игра (активны ли кнопки)
   const [activeRenamePopup, setActiveRenamePopup] = useState(true) // активен ли попап ренейма
   const [activeStatisticPopup, setActiveStatisticPopup] = useState(false) // Активна ли таблица со статистикой
+  
+  const [generalStatistic, setGeneralStatistic] = useState({}) // Статистика по прошлым игрокам
+  const [activePlayersData, setActivePlayersData] = useState({}) // Статистика по действующим игрокам
+  
+
+  // {
+  //   "Камила": {gameWins: 0, details: {wins: 2, losses: 3, draw: 2}}
+  //   "Алехандр": {gameWins: 1, details: {wins: 3, losses: 2, draw: 2}}
+  // }
+
+
 
   const checkWinner = (currentGrid) => {
     for (const line of LINES) {
@@ -129,6 +141,7 @@ export default function PlayCard() {
       const playerScores = scores
 
       if (playerScores.player1 + 1 >= 3 || playerScores.player2 + 1 >= 3) {
+        updateActivePlayersData()
         setActiveStatisticPopup(true)
         return
       }
@@ -175,6 +188,18 @@ export default function PlayCard() {
 
   function renamePlayers(playerName1, playerName2) {
     setPlayerNames({player1: playerName1, player2: playerName2})
+    // Прям тут можно добавлять данные из activePlayersData в generalStatistic
+    setActivePlayersData({
+      [playerName1]: {gameWins: 0, played: 0, details: {wins: 0, losses: 0, draw: 0}},
+      [playerName2]: {gameWins: 0, played: 0, details: {wins: 0, losses: 0, draw: 0}}
+    })
+  }
+
+  // Обновление данных для таблицы (перед показом самой таблицы)
+  function updateActivePlayersData() {
+    const data = Object.entries(activePlayersData)
+    // ПРОДОЛЖАЕМ ОТ СЮДА.
+    // НАДО ОРГАНИЗОВАТЬ ИЗМЕНЕНИЕ ДАННЫХ. ПОКА ЧТО ГОТОВ ТОЛЬКО ПЕРЕНОМ ИХ В ТАБЛИЦУ
   }
 
   return (
@@ -214,7 +239,9 @@ export default function PlayCard() {
       )}
 
       {activeStatisticPopup && (
-        <StaticticTable 
+        <StaticticTable
+        generalStatistic={generalStatistic}
+        activePlayersData={activePlayersData}
         newGame={() => resetGame()}
         resetGame={() => {
           resetGrid()

@@ -1,6 +1,6 @@
 import './StatisticTable.css'
 
-export default function StaticticTable({ newGame, resetGame }) {
+export default function StaticticTable({ generalStatistic, activePlayersData, newGame, resetGame }) {
     // setStatistic({
     //   playerName1: {gameWins: 0, draw: 0 ,wins: 0, played: 0},
     //   playerName2: {gameWins: 0, draw: 0 ,wins: 0, played: 0}
@@ -24,7 +24,16 @@ export default function StaticticTable({ newGame, resetGame }) {
                 </thead>
 
                 <tbody>
-                    {/* Динамичные значения из localStorage */}
+                    {Object.entries(activePlayersData).map(([playerName, playerData], index) => {
+                        return (
+                            <tr key={index}>
+                                <td>{playerName}</td>
+                                <td>{playerData.gameWins}</td>
+                                <td>{playerData.played}</td>
+                                <td><a href="#">Подробная статистика</a></td>
+                            </tr>
+                        )
+                    })}
                     <tr>
                         <td>Player 1</td>
                         <td>3</td>
@@ -38,7 +47,7 @@ export default function StaticticTable({ newGame, resetGame }) {
                         <td>4</td>
                         <td><a href="#">Подробная статистика</a></td>
                     </tr>
-                    
+
                 </tbody>
             </table>
         </div>
