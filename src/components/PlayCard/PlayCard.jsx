@@ -73,17 +73,17 @@ export default function PlayCard() {
   const [grid, setGrid] = useState(Array(9).fill(null)) // клетки [null, null, null, null, null, null, null, null, null]
   const [isXTurn, setIsXTurn] = useState(true) // чей ход (true = x | false - o)
   const [scores, setScores] = useState({ player1: 2, player2: 0 })
-  const [playerNames, setPlayerNames] = useState({player1: "Игрок 1", player2: "Игрок 2"}) // Имена игроков
+  const [playerNames, setPlayerNames] = useState({ player1: "Игрок 1", player2: "Игрок 2" }) // Имена игроков
   const [showWinPopup, setShowWinPopup] = useState(false) // показ попап с победителем
   const [winnerMessage, setWinnerMessage] = useState("") // кто победил
 
   const [gameActive, setGameActive] = useState(true) // активна ли игра (активны ли кнопки)
   const [activeRenamePopup, setActiveRenamePopup] = useState(true) // активен ли попап ренейма
   const [activeStatisticPopup, setActiveStatisticPopup] = useState(false) // Активна ли таблица со статистикой
-  
+
   const [generalStatistic, setGeneralStatistic] = useState({}) // Статистика по прошлым игрокам
   const [activePlayersData, setActivePlayersData] = useState({}) // Статистика по действующим игрокам
-  
+
 
   // {
   //   "Камила": {gameWins: 0, details: {wins: 2, losses: 3, draw: 2}}
@@ -123,29 +123,44 @@ export default function PlayCard() {
 
     const winner = checkWinner(newGrid)
 
+    let data = Object.entries(activePlayersData) // Массив для статистики
+
+    let playerScores = scores
+
     if (winner) {
       setGameActive(false)
 
       if (winner === "player1") {
-        setScores(prev => ({ ...prev, player1: prev.player1 + 1 }))
+        playerScores.player1 += 3
+        data[0][1].details.wins += 1
         setWinnerMessage(playerNames.player1)
 
       } else if (winner === "player2") {
-        setScores(prev => ({ ...prev, player2: prev.player2 + 1 }))
+        playerScores.player2 += 3
+        data[1][1].details.wins += 1
         setWinnerMessage(playerNames.player2)
 
       } else { // if draw
         setWinnerMessage("НИКТО НЕ")
+        data[0][1].details.draw += 1
+        data[1][1].details.draw += 1
       }
 
-      const playerScores = scores
+      setScores(playerScores)
 
-      if (playerScores.player1 + 1 >= 3 || playerScores.player2 + 1 >= 3) {
-        updateActivePlayersData()
+      if (playerScores.player1 >= 3 || playerScores.player2 >= 3) {
+        if (winner === "player1") {
+          data[0][1].gameWins += 1
+        } else {
+          data[1][1].gameWins += 1
+        }
+        data[0][1].played += 1
+        data[1][1].played += 1
+
+        setActivePlayersData(Object.fromEntries(data))
         setActiveStatisticPopup(true)
         return
       }
-
       setShowWinPopup(true)
 
     } else { // Смена хода
@@ -187,19 +202,12 @@ export default function PlayCard() {
   }
 
   function renamePlayers(playerName1, playerName2) {
-    setPlayerNames({player1: playerName1, player2: playerName2})
-    // Прям тут можно добавлять данные из activePlayersData в generalStatistic
+    setPlayerNames({ player1: playerName1, player2: playerName2 })
+    setGeneralStatistic(prev => ({...activePlayersData, ...prev}))
     setActivePlayersData({
-      [playerName1]: {gameWins: 0, played: 0, details: {wins: 0, losses: 0, draw: 0}},
-      [playerName2]: {gameWins: 0, played: 0, details: {wins: 0, losses: 0, draw: 0}}
+      [playerName1]: { gameWins: 0, played: 0, details: { wins: 0, draw: 0 } },
+      [playerName2]: { gameWins: 0, played: 0, details: { wins: 0, draw: 0 } }
     })
-  }
-
-  // Обновление данных для таблицы (перед показом самой таблицы)
-  function updateActivePlayersData() {
-    const data = Object.entries(activePlayersData)
-    // ПРОДОЛЖАЕМ ОТ СЮДА.
-    // НАДО ОРГАНИЗОВАТЬ ИЗМЕНЕНИЕ ДАННЫХ. ПОКА ЧТО ГОТОВ ТОЛЬКО ПЕРЕНОМ ИХ В ТАБЛИЦУ
   }
 
   return (
@@ -210,10 +218,10 @@ export default function PlayCard() {
       </h3>
 
       <div className="turn-indicator">
-        Сейчас ходит: {isXTurn ? 
-        `${activeRenamePopup ? 'Игрок 1' : playerNames.player1} (X)` 
-        : 
-        `${activeRenamePopup ? 'Игрок 2' : playerNames.player2} (O)`}
+        Сейчас ходит: {isXTurn ?
+          `${activeRenamePopup ? 'Игрок 1' : playerNames.player1} (X)`
+          :
+          `${activeRenamePopup ? 'Игрок 2' : playerNames.player2} (O)`}
       </div>
 
       <div className="grid">
@@ -232,21 +240,21 @@ export default function PlayCard() {
       )}
 
       {activeRenamePopup && (
-        <PlayerRegister 
-          activePopup={(value) => setActiveRenamePopup(value)} 
-          renamePlayers={(playerName1, playerName2) => renamePlayers(playerName1, playerName2)} 
+        <PlayerRegister
+          activePopup={(value) => setActiveRenamePopup(value)}
+          renamePlayers={(playerName1, playerName2) => renamePlayers(playerName1, playerName2)}
         />
       )}
 
       {activeStatisticPopup && (
         <StaticticTable
-        generalStatistic={generalStatistic}
-        activePlayersData={activePlayersData}
-        newGame={() => resetGame()}
-        resetGame={() => {
-          resetGrid()
-          setScores({ player1: 0, player2: 0 })
-        }}
+          generalStatistic={generalStatistic}
+          activePlayersData={activePlayersData}
+          newGame={() => resetGame()}
+          resetGame={() => {
+            resetGrid()
+            setScores({ player1: 0, player2: 0 })
+          }}
         />
       )}
     </div>

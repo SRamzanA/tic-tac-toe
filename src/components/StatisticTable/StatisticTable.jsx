@@ -1,10 +1,8 @@
 import './StatisticTable.css'
 
 export default function StaticticTable({ generalStatistic, activePlayersData, newGame, resetGame }) {
-    // setStatistic({
-    //   playerName1: {gameWins: 0, draw: 0 ,wins: 0, played: 0},
-    //   playerName2: {gameWins: 0, draw: 0 ,wins: 0, played: 0}
-    // })
+
+    // Теперь надо доделать показ данных, реализовать функцию показа подробной информации
 
     return (
         <div className="stat-popup">
@@ -26,6 +24,17 @@ export default function StaticticTable({ generalStatistic, activePlayersData, ne
                 <tbody>
                     {Object.entries(activePlayersData).map(([playerName, playerData], index) => {
                         return (
+                            <tr key={index} className='activePlayers'>
+                                <td>{'> ' + playerName}</td>
+                                <td>{playerData.gameWins}</td>
+                                <td>{playerData.played}</td>
+                                <td><a href="#">Подробная статистика</a></td>
+                            </tr>
+                        )
+                    })}
+
+                    {Object.entries(generalStatistic).map(([playerName, playerData], index) => {
+                        return (
                             <tr key={index}>
                                 <td>{playerName}</td>
                                 <td>{playerData.gameWins}</td>
@@ -35,14 +44,14 @@ export default function StaticticTable({ generalStatistic, activePlayersData, ne
                         )
                     })}
                     <tr>
-                        <td>Player 1</td>
+                        <td>Test 1</td>
                         <td>3</td>
                         <td>4</td>
                         <td><a href="#">Подробная статистика</a></td>
                     </tr>
 
                     <tr>
-                        <td>Player 2</td>
+                        <td>Test 2</td>
                         <td>1</td>
                         <td>4</td>
                         <td><a href="#">Подробная статистика</a></td>

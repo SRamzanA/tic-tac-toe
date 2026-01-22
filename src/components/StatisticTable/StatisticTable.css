@@ -57,6 +57,10 @@ tbody > tr {
     background-color: #4caf4f63;
 }
 
+.activePlayers {
+    background: linear-gradient(to right, #00ff0499, #4caf4f63);
+}
+
 td {
     padding-left: 0.5rem;
 }
