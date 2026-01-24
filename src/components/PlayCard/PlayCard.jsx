@@ -47,22 +47,6 @@ const WinPopup = ({ winner, onClose }) => {
   )
 }
 
-// Игра должна быть до трёх побед, после которых будет отображаться таблица с победами игроков
-// Это надо сделать исключительно после создания функционала создания имени игрокам перед игрой
-
-// Данные выигрыша должны сохраняться только после победы одного из игроков
-// Это позволит избежать как минимум одной ошибки
-
-// Сохраняется пара имён игроков с их статистикой по выигрышам.
-// Одним выигрышем считается 1 победа в матче
-// Пример структуры данных:
-// {
-//   "Вадим": { wins: 1, played: 3 },
-//   "Александр": { wins: 3, played: 1 }
-// }
-// Можно добавить подробную статистику с выиграными и проигранными партиями, а также нечьими 
-
-
 const LINES = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8], // горизонтальные
   [0, 3, 6], [1, 4, 7], [2, 5, 8], // вертикальные 
@@ -72,7 +56,7 @@ const LINES = [
 export default function PlayCard() {
   const [grid, setGrid] = useState(Array(9).fill(null)) // клетки [null, null, null, null, null, null, null, null, null]
   const [isXTurn, setIsXTurn] = useState(true) // чей ход (true = x | false - o)
-  const [scores, setScores] = useState({ player1: 2, player2: 0 })
+  const [scores, setScores] = useState({ player1: 0, player2: 0 })
   const [playerNames, setPlayerNames] = useState({ player1: "Игрок 1", player2: "Игрок 2" }) // Имена игроков
   const [showWinPopup, setShowWinPopup] = useState(false) // показ попап с победителем
   const [winnerMessage, setWinnerMessage] = useState("") // кто победил
@@ -84,13 +68,16 @@ export default function PlayCard() {
   const [generalStatistic, setGeneralStatistic] = useState({}) // Статистика по прошлым игрокам
   const [activePlayersData, setActivePlayersData] = useState({}) // Статистика по действующим игрокам
 
-
+  // Пара игроков
   // {
-  //   "Камила": {gameWins: 0, details: {wins: 2, losses: 3, draw: 2}}
-  //   "Алехандр": {gameWins: 1, details: {wins: 3, losses: 2, draw: 2}}
+  //   "Гриффиндор": {gameWins: 0, played: 1, details: {wins: 2, losses: 3, draw: 2}}
+  //   "Экономический": {gameWins: 1, played: 1, details: {wins: 3, losses: 2, draw: 2}}
   // }
 
-
+  useEffect(() => {
+    setGeneralStatistic(JSON.parse(localStorage.getItem("generalStatistic")) || {})
+    setActivePlayersData(JSON.parse(localStorage.getItem("activePlayers")) || {})
+  }, [])
 
   const checkWinner = (currentGrid) => {
     for (const line of LINES) {
@@ -131,13 +118,15 @@ export default function PlayCard() {
       setGameActive(false)
 
       if (winner === "player1") {
-        playerScores.player1 += 3
+        playerScores.player1 += 1
         data[0][1].details.wins += 1
+        data[1][1].details.losses += 1
         setWinnerMessage(playerNames.player1)
 
       } else if (winner === "player2") {
-        playerScores.player2 += 3
+        playerScores.player2 += 1
         data[1][1].details.wins += 1
+        data[0][1].details.losses += 1
         setWinnerMessage(playerNames.player2)
 
       } else { // if draw
@@ -159,6 +148,10 @@ export default function PlayCard() {
 
         setActivePlayersData(Object.fromEntries(data))
         setActiveStatisticPopup(true)
+
+        // Сохрание статистики в localStorage
+        localStorage.setItem('generalStatistic', JSON.stringify(generalStatistic))
+        localStorage.setItem('activePlayers', JSON.stringify(Object.fromEntries(data)))
         return
       }
       setShowWinPopup(true)
@@ -203,11 +196,12 @@ export default function PlayCard() {
 
   function renamePlayers(playerName1, playerName2) {
     setPlayerNames({ player1: playerName1, player2: playerName2 })
-    setGeneralStatistic(prev => ({...activePlayersData, ...prev}))
+    setGeneralStatistic(prev => ({ ...activePlayersData, ...prev }))
     setActivePlayersData({
-      [playerName1]: { gameWins: 0, played: 0, details: { wins: 0, draw: 0 } },
-      [playerName2]: { gameWins: 0, played: 0, details: { wins: 0, draw: 0 } }
+      [playerName1]: { gameWins: 0, played: 0, details: { wins: 0, losses: 0, draw: 0 } },
+      [playerName2]: { gameWins: 0, played: 0, details: { wins: 0, losses: 0, draw: 0 } }
     })
+
   }
 
   return (

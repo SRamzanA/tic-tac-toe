@@ -41,11 +41,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.2s;
   position: relative;
 }
 
-.grid-cell:hover {
+.grid-cell:hover,
+.grid-cell:hover .circle-inner {
   background-color: #f0f0f0;
 }
 
@@ -98,6 +99,7 @@
   height: 70%;
   background-color: white;
   border-radius: 50%;
+  transition: 0.2s;
 }
 
 /* Попап победы */
@@ -150,6 +152,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
